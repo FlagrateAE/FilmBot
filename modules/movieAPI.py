@@ -1,4 +1,5 @@
 import requests
+from modules.types import Movie
 
 
 class MovieAPI:
@@ -12,11 +13,14 @@ class MovieAPI:
 
     def search(self, query: str, language: str = "uk-UA", include_adult: bool = False):
         url = self.BASE_URL + "/search/movie"
-
-        response = requests.get(url, params={
+        
+        params = {
                 "query": query,
                 "language": language,
                 "include_adult": str(include_adult)
-            }, headers=self.HEADERS)
+            }
+
+        results = requests.get(url, params, headers=self.HEADERS).json()["results"]
+        best_match = Movie.from_api(results[0])
         
-        return response.text
+        return best_match

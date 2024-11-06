@@ -27,8 +27,8 @@ async def start(message: types.Message):
 @dp.message(Command("search"))
 async def find(message: types.Message, command: CommandObject):    
     if command.args:
-        search_results = api.search(query=command.args)
-        await message.answer(search_results)
+        search_result = api.search(query=command.args)
+        await message.answer(search_result.text)
     else:
         await message.answer("💔 Неправильне використання команди, введіть параметри пошуку.")
     
