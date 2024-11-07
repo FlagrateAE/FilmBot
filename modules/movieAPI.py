@@ -11,16 +11,46 @@ class MovieAPI:
             "Accept": "application/json",
         }
 
+    def api_call(self, endpoint: str, params: dict = {}) -> dict:
+        url = self.BASE_URL + endpoint
+        response = requests.get(url, params, headers=self.HEADERS)
+
+        return response.json()
+
     def search(self, query: str, language: str = "uk-UA", include_adult: bool = False):
-        url = self.BASE_URL + "/search/movie"
-        
-        params = {
+        searchResults = self.api_call(
+            endpoint="/search/movie",
+            params={
                 "query": query,
                 "language": language,
-                "include_adult": str(include_adult)
-            }
+                "include_adult": str(include_adult),
+            },
+        )["results"]
 
-        results = requests.get(url, params, headers=self.HEADERS).json()["results"]
-        best_match = Movie.from_api(results[0])
+        if not searchResults:
+            return None
+
+        best_match = searchResults[0]
+        trailer_url = self.get_trailer_url(best_match["id"], language)
+        best_match["trailer_url"] = trailer_url
+
+        return Movie.from_api(best_match)
+
+    def get_trailer_url(self, movie_id: int, language: str = "uk-UA") -> str | None:
+        videos = self.api_call(
+            endpoint=f"/movie/{movie_id}/videos",
+            params={"language": language},
+        )["results"]
         
-        return best_match
+        if not videos:
+            # if no trailer found in default language, try English
+            videos = self.api_call(
+                endpoint=f"/movie/{movie_id}/videos",
+                params={"language": "en-US"},
+            )["results"]
+
+        for video in videos:
+            if video["type"] == "Trailer" and video["site"] == "YouTube":
+                return f"https://www.youtube.com/watch?v={video['key']}"
+
+        return None

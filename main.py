@@ -21,6 +21,7 @@ api = MovieAPI(os.getenv("TMDB_ACCESS_TOKEN"))
 
 @dp.message(Command("start"))
 async def start(message: types.Message):
+    
     await message.reply("test")
     
     
@@ -28,7 +29,10 @@ async def start(message: types.Message):
 async def find(message: types.Message, command: CommandObject):    
     if command.args:
         search_result = api.search(query=command.args)
-        await message.answer(search_result.text)
+        await message.answer_photo(
+            photo=search_result.poster_path,
+            caption=search_result.text
+        )
     else:
         await message.answer("💔 Неправильне використання команди, введіть параметри пошуку.")
     
