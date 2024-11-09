@@ -9,6 +9,7 @@ class FavoritesDB:
 
     def init_db(self):
         """Initialize the database and create the favorites table if it doesn't exist."""
+        
         with sqlite3.connect(self.db_path) as conn:
             self.conn = conn
             self.cursor = conn.cursor()
@@ -27,22 +28,26 @@ class FavoritesDB:
         """
         Add a movie to a user's favorites list
 
-        Args:
-            user_id: The ID of the user
-            movie_id: The ID of the movie to add
+        Parameters
+        ----------
+        user_id : int
+            The Telegram ID of the user.
+        movie_id : int
+            The ID of the movie.
         """
+        
         # get current movies
         self.cursor.execute(
             "SELECT movies FROM favorites WHERE user_id = ?", (user_id,)
         )
         result = self.cursor.fetchone()
 
-        # Parse current movies and add new one
+        # parse current movies and add new one
         movies = json.loads(result[0])
         if movie_id not in movies:
             movies.append(movie_id)
 
-        # Update the database
+        # update the database
         self.cursor.execute(
             "UPDATE favorites SET movies = ? WHERE user_id = ?",
             (json.dumps(movies), user_id),
@@ -53,11 +58,15 @@ class FavoritesDB:
         """
         Get the list of favorite movies for a user
 
-        Args:
-            user_id: The ID of the user
-
-        Returns:
-            list[int]: List of movie IDs
+        Parameters
+        ----------
+        user_id : int
+            The Telegram ID of the user.
+            
+        Returns
+        -------
+        list[int]
+            A list of favorite movie IDs.
         """
         self.cursor.execute(
             "SELECT movies FROM favorites WHERE user_id = ?", (user_id,)
@@ -72,10 +81,12 @@ class FavoritesDB:
         """
         Create a new user with an empty movies list (on /start command)
 
-        Args:
-            user_id: The ID of the new user
+        Parameters
+        ----------
+        user_id : int
+            The Telegram ID of the user.
         """
-        if self.get_user_movies(user_id) == None:   
+        if self.get_user_movies(user_id) == None:
             self.cursor.execute(
                 "INSERT INTO favorites (user_id, movies) VALUES (?, ?)",
                 (user_id, "[]"),
