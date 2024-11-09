@@ -5,6 +5,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 
 from modules.movieAPI import MovieAPI
+from modules.database import FavoritesDB
 
 import logging
 import os
@@ -17,12 +18,13 @@ bot = Bot(
 )
 dp = Dispatcher()
 api = MovieAPI(os.getenv("TMDB_ACCESS_TOKEN"))
+db = FavoritesDB()
 
 
 @dp.message(Command("start"))
 async def start(message: types.Message):
-    
-    await message.reply("test")
+    db.new_user(message.from_user.id)
+    await message.reply("Вас вітає Flagrate Movie Bot! Введіть /search <назва фільму> для пошуку фільму.")
     
     
 @dp.message(Command("search"))
@@ -39,6 +41,6 @@ async def find(message: types.Message, command: CommandObject):
     
 async def main():
     await dp.start_polling(bot)
-
+    
 if __name__ == "__main__":
     asyncio.run(main())

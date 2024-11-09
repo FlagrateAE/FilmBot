@@ -1,0 +1,89 @@
+import sqlite3
+import json
+
+
+class FavoritesDB:
+    def __init__(self, db_path: str = "database.db"):
+        self.db_path = db_path
+        self.init_db()
+
+    def init_db(self):
+        """Initialize the database and create the favorites table if it doesn't exist."""
+        with sqlite3.connect(self.db_path) as conn:
+            self.conn = conn
+            self.cursor = conn.cursor()
+
+            self.cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS favorites (
+                    user_id INTEGER PRIMARY KEY,
+                    movies TEXT
+                )
+            """
+            )
+            conn.commit()
+
+    def add_movie_to_user(self, user_id: int, movie_id: int):
+        """
+        Add a movie to a user's favorites list
+
+        Args:
+            user_id: The ID of the user
+            movie_id: The ID of the movie to add
+        """
+        # get current movies
+        self.cursor.execute(
+            "SELECT movies FROM favorites WHERE user_id = ?", (user_id,)
+        )
+        result = self.cursor.fetchone()
+
+        # Parse current movies and add new one
+        movies = json.loads(result[0])
+        if movie_id not in movies:
+            movies.append(movie_id)
+
+        # Update the database
+        self.cursor.execute(
+            "UPDATE favorites SET movies = ? WHERE user_id = ?",
+            (json.dumps(movies), user_id),
+        )
+        self.conn.commit()
+
+    def get_user_movies(self, user_id: int) -> list[int]:
+        """
+        Get the list of favorite movies for a user
+
+        Args:
+            user_id: The ID of the user
+
+        Returns:
+            list[int]: List of movie IDs
+        """
+        self.cursor.execute(
+            "SELECT movies FROM favorites WHERE user_id = ?", (user_id,)
+        )
+        result = self.cursor.fetchone()
+
+        if result:
+            return json.loads(result[0])
+        return None
+
+    def new_user(self, user_id: int) -> bool:
+        """
+        Create a new user with an empty movies list (on /start command)
+
+        Args:
+            user_id: The ID of the new user
+        """
+        if self.get_user_movies(user_id) == None:   
+            self.cursor.execute(
+                "INSERT INTO favorites (user_id, movies) VALUES (?, ?)",
+                (user_id, "[]"),
+            )
+            self.conn.commit()
+        else:
+            print("User already exists")
+
+    def get_all(self):
+        self.cursor.execute("SELECT * FROM favorites")
+        return self.cursor.fetchall()
