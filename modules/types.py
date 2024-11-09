@@ -1,7 +1,7 @@
 class Movie:
     """
     Class representing a movie
-    
+
     Attributes
     ------------
     movie_id: int
@@ -21,7 +21,7 @@ class Movie:
     trailer_url: str
         The YouTube URL of the trailer of the movie
     """
-    
+
     def __init__(
         self,
         movie_id: int,
@@ -45,13 +45,13 @@ class Movie:
     def text(self):
         """
         A formatted text representation of the movie for Telegram
-        
+
         Returns
         -------
         str
             A formatted text representation of the movie
         """
-        
+
         result = ""
 
         result += f"🎬 <b>{self.title}</b>\n\n"
@@ -66,7 +66,7 @@ class Movie:
         return result
 
     @classmethod
-    def from_api(cls, data: dict):  
+    def from_api(cls, data: dict):
         """
         Creates a Movie instance from API data.
 
@@ -80,7 +80,7 @@ class Movie:
         Movie
             A Movie instance created from the API data.
         """
-        
+
         poster_url = f"https://image.tmdb.org/t/p/w500/{data['poster_path']}"
         rating: float = round(data["vote_average"], 1)
 
@@ -91,5 +91,5 @@ class Movie:
             data["release_date"][:4],  # year
             data["overview"],
             poster_url,
-            data["trailer_url"]
+            data["trailer_url"],
         )

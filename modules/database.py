@@ -9,7 +9,7 @@ class FavoritesDB:
 
     def init_db(self):
         """Initialize the database and create the favorites table if it doesn't exist."""
-        
+
         with sqlite3.connect(self.db_path) as conn:
             self.conn = conn
             self.cursor = conn.cursor()
@@ -35,7 +35,7 @@ class FavoritesDB:
         movie_id : int
             The ID of the movie.
         """
-        
+
         # get current movies
         self.cursor.execute(
             "SELECT movies FROM favorites WHERE user_id = ?", (user_id,)
@@ -62,7 +62,7 @@ class FavoritesDB:
         ----------
         user_id : int
             The Telegram ID of the user.
-            
+
         Returns
         -------
         list[int]
