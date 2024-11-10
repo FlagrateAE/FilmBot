@@ -6,6 +6,7 @@ from aiogram.enums.parse_mode import ParseMode
 
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
+from modules.types import AddToFavoritesMarkup, RemoveFromFavoritesMarkup
 
 import logging
 import os
@@ -35,7 +36,7 @@ async def start(message: types.Message):
 
 
 @dp.message(Command("search"))
-async def find(message: types.Message, command: CommandObject):
+async def search(message: types.Message, command: CommandObject):
     if command.args:
         search_result = api.search(query=command.args)
 
@@ -45,16 +46,7 @@ async def find(message: types.Message, command: CommandObject):
             )
             return
 
-        markup = types.InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    types.InlineKeyboardButton(
-                        text="⭐ Додати до улюблених",
-                        callback_data=f"add_to_favorites:{search_result.movie_id}",
-                    )
-                ]
-            ]
-        )
+        markup = AddToFavoritesMarkup(search_result.movie_id)
 
         await message.answer_photo(
             photo=search_result.poster_path,
@@ -67,20 +59,23 @@ async def find(message: types.Message, command: CommandObject):
         )
 
 
-@dp.callback_query()
-async def callback_query_handler(callback: types.CallbackQuery):
-    callback_data = callback.data.split(":")
+@dp.callback_query(F.data.startswith("favorites"))
+async def update_favorites(callback: types.CallbackQuery):
+    command = callback.data.removeprefix("favorites_")
+    
+    movie_id = int(command.split(":")[1])
+    action = command.split(":")[0]
 
-    match callback_data[0]:
-        case "add_to_favorites":
-            db.add_movie_to_user(
-                user_id=callback.from_user.id,
-                movie_id=int(int(callback_data[1])),
-            )
-            await callback.answer(
-                text=str(db.get_all()),
-                show_alert=True
-            )
+    db.update_movies_in_user(callback.from_user.id, action, movie_id)
+
+    if action == "add":
+        await callback.answer("✅ Фільм додано до улюблених")
+        markup = RemoveFromFavoritesMarkup(movie_id)
+    elif action == "remove":
+        await callback.answer("❌ Фільм видалено з улюблених")
+        markup = AddToFavoritesMarkup(movie_id)
+
+    await callback.message.edit_reply_markup(reply_markup=markup)
 
 
 @dp.message(Command("all"))

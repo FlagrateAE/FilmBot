@@ -24,16 +24,18 @@ class FavoritesDB:
             )
             conn.commit()
 
-    def add_movie_to_user(self, user_id: int, movie_id: int):
+    def update_movies_in_user(self, user_id: int, action: str, movie_id: int):
         """
-        Add a movie to a user's favorites list
+        Update a user's favorite movies list
 
         Parameters
         ----------
         user_id : int
             The Telegram ID of the user.
+        action : str
+            The action to perform: "add" or "remove" a movie
         movie_id : int
-            The ID of the movie.
+            The ID of the movie to add or remove
         """
 
         # get current movies
@@ -41,16 +43,21 @@ class FavoritesDB:
             "SELECT movies FROM favorites WHERE user_id = ?", (user_id,)
         )
         result = self.cursor.fetchone()
+        favorite = json.loads(result[0])
 
-        # parse current movies and add new one
-        movies = json.loads(result[0])
-        if movie_id not in movies:
-            movies.append(movie_id)
+        # perform action
+        if action == "add":
+            if movie_id not in favorite:
+                favorite.append(movie_id)
+
+        elif action == "remove":
+            if movie_id in favorite:
+                favorite.remove(movie_id)
 
         # update the database
         self.cursor.execute(
             "UPDATE favorites SET movies = ? WHERE user_id = ?",
-            (json.dumps(movies), user_id),
+            (json.dumps(favorite), user_id),
         )
         self.conn.commit()
 
