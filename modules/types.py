@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from modules.messageTemplates import Template
 
 
 class Movie:
@@ -113,7 +114,7 @@ class AddToFavoritesMarkup(InlineKeyboardMarkup):
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
-                        text="❤️ Додати до улюблених",
+                        text=Template.FAVORITES_ADD_BUTTON,
                         callback_data=f"favorites_add:{movie_id}",
                     )
                 ],
@@ -137,7 +138,7 @@ class RemoveFromFavoritesMarkup(InlineKeyboardMarkup):
             inline_keyboard=[
                 [
                     InlineKeyboardButton(
-                        text="❌ Видалити з улюблених",
+                        text=Template.FAVORITES_REMOVE_BUTTON,
                         callback_data=f"favorites_remove:{movie_id}",
                     )
                 ],

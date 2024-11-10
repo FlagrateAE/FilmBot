@@ -7,6 +7,8 @@ from aiogram.enums.parse_mode import ParseMode
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 from modules.types import AddToFavoritesMarkup, RemoveFromFavoritesMarkup
+from modules.messageTemplates import Template
+
 
 import logging
 import os
@@ -26,13 +28,9 @@ db = FavoritesDB()
 async def start(message: types.Message):
     try:
         db.new_user(message.from_user.id)
-        await message.answer(
-            f"Вас вітає Flagrate Movie Bot! Введіть /search [назва фільму] для пошуку фільму."
-        )
+        await message.answer(Template.START)
     except Exception as e:
-        await message.answer(
-            "💔 Щось пішло не так. Спробуйте команду /start ще раз пізніше\nФункціонал улюблених фільмів тимчасово недоступний"
-        )
+        await message.answer(Template.START_DB_ERROR)
 
 
 @dp.message(Command("search"))
@@ -41,9 +39,7 @@ async def search(message: types.Message, command: CommandObject):
         search_result = api.search(query=command.args)
 
         if not search_result:
-            await message.answer(
-                "💔 Нічого не знайдено. Спробуйте інший пошуковий запит або англійську мову"
-            )
+            await message.answer(Template.SEARCH_NOT_FOUND)
             return
 
         markup = AddToFavoritesMarkup(search_result.movie_id)
@@ -54,25 +50,23 @@ async def search(message: types.Message, command: CommandObject):
             reply_markup=markup,
         )
     else:
-        await message.answer(
-            "💔 Неправильне використання команди, введіть параметри пошуку."
-        )
+        await message.answer(Template.SEARCH_NO_ARGS)
 
 
 @dp.callback_query(F.data.startswith("favorites"))
 async def update_favorites(callback: types.CallbackQuery):
     command = callback.data.removeprefix("favorites_")
-    
+
     movie_id = int(command.split(":")[1])
     action = command.split(":")[0]
 
     db.update_movies_in_user(callback.from_user.id, action, movie_id)
 
     if action == "add":
-        await callback.answer("✅ Фільм додано до улюблених")
+        await callback.answer(Template.FAVORITES_ADDED_ALERT)
         markup = RemoveFromFavoritesMarkup(movie_id)
     elif action == "remove":
-        await callback.answer("❌ Фільм видалено з улюблених")
+        await callback.answer(Template.FAVORITES_REMOVED_ALERT)
         markup = AddToFavoritesMarkup(movie_id)
 
     await callback.message.edit_reply_markup(reply_markup=markup)
