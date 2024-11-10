@@ -160,7 +160,7 @@ class MovieAPI:
 
     def movie_factory(
         self, movie_ids: list[int], language: str = "uk-UA"
-    ) -> list[Movie]: 
+    ) -> list[Movie]:
         """
         Returns a list of Movie objects for the specified list of TMDB IDs.
 
