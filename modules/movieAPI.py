@@ -134,3 +134,46 @@ class MovieAPI:
                 return f"https://www.youtube.com/watch?v={video['key']}"
 
         return None
+
+    def get_movie(self, movie_id: int, language: str = "uk-UA") -> Movie:
+        """
+        Returns a Movie object for the specified TMDB ID.
+
+        Parameters
+        ----------
+        movie_id : int
+            The TMDB ID of the movie.
+        language : str, optional
+            The language to search in. Defaults to "uk-UA" (Ukrainian).
+
+        Returns
+        -------
+        Movie
+            A Movie object for the specified TMDB ID.
+        """
+        movie_data = self.api_call(
+            endpoint=f"/movie/{movie_id}", params={"language": language}
+        )
+        movie_data["trailer_url"] = self.get_trailer_url(movie_id, language)
+
+        return Movie.from_api(movie_data)
+
+    def movie_factory(
+        self, movie_ids: list[int], language: str = "uk-UA"
+    ) -> list[Movie]: 
+        """
+        Returns a list of Movie objects for the specified list of TMDB IDs.
+
+        Parameters
+        ----------
+        movie_ids : list[int]
+            A list of TMDB IDs of the movies.
+        language : str, optional
+            The language to search in. Defaults to "uk-UA" (Ukrainian).
+
+        Returns
+        -------
+        list[Movie]
+            A list of Movie objects for the specified list of TMDB IDs.
+        """
+        return [self.get_movie(movie_id, language) for movie_id in movie_ids]

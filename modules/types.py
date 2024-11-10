@@ -46,7 +46,7 @@ class Movie:
         self.trailer_url = trailer_url
 
     @property
-    def text(self):
+    def text(self) -> str:
         """
         A formatted text representation of the movie for Telegram
 
@@ -102,7 +102,7 @@ class Movie:
 class AddToFavoritesMarkup(InlineKeyboardMarkup):
     """
     Class representing the inline keyboard markup containing a single button for adding a movie to favorites
-    
+
     Parameters
     ----------
     movie_id : int
@@ -125,14 +125,13 @@ class AddToFavoritesMarkup(InlineKeyboardMarkup):
 class RemoveFromFavoritesMarkup(InlineKeyboardMarkup):
     """
     Class representing the inline keyboard markup containing a single button for removing a movie from favorites
-    
+
     Parameters
     ----------
     movie_id : int
         The TMDB ID of the movie to remove from favorites
     """
-    
-    
+
     def __init__(self, movie_id: int):
         super().__init__(
             inline_keyboard=[
@@ -142,5 +141,20 @@ class RemoveFromFavoritesMarkup(InlineKeyboardMarkup):
                         callback_data=f"favorites_remove:{movie_id}",
                     )
                 ],
+            ]
+        )
+
+
+class FavoritesMarkup(InlineKeyboardMarkup):
+    def __init__(self, movies: list[Movie]):
+        super().__init__(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=movie.title,
+                        callback_data=f"expand:{movie.movie_id}",
+                    )
+                ]
+                for movie in movies
             ]
         )

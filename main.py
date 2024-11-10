@@ -6,9 +6,12 @@ from aiogram.enums.parse_mode import ParseMode
 
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
-from modules.types import AddToFavoritesMarkup, RemoveFromFavoritesMarkup
+from modules.types import (
+    AddToFavoritesMarkup,
+    RemoveFromFavoritesMarkup,
+    FavoritesMarkup,
+)
 from modules.messageTemplates import Template
-
 
 import logging
 import os
@@ -70,6 +73,35 @@ async def update_favorites(callback: types.CallbackQuery):
         markup = AddToFavoritesMarkup(movie_id)
 
     await callback.message.edit_reply_markup(reply_markup=markup)
+
+
+@dp.message(Command("favorites"))
+async def show_favorites(message: types.Message):
+    favorites = db.get_user_movies(message.from_user.id)
+
+    if not favorites:
+        await message.answer(Template.FAVORITES_EMPTY)
+        return
+
+    markup = FavoritesMarkup(api.movie_factory(favorites))
+
+    await message.answer(Template.FAVORITES_SHOW, reply_markup=markup)
+
+
+@dp.callback_query(F.data.startswith("expand"))
+async def show_movie_info(callback: types.CallbackQuery):
+    movie_id = int(callback.data.removeprefix("expand:"))
+    movie = api.get_movie(movie_id)
+
+    markup = RemoveFromFavoritesMarkup(movie_id)
+
+    await callback.message.answer_photo(
+        photo=movie.poster_path,
+        caption=movie.text,
+        reply_markup=markup,
+    )
+
+    await callback.answer()
 
 
 @dp.message(Command("all"))
