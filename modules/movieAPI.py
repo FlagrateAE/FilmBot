@@ -1,5 +1,5 @@
 import requests
-from modules.types import Movie
+from modules.types.movie import Movie
 
 
 class MovieAPI:

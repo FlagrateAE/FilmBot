@@ -1,7 +1,3 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from modules.messageTemplates import Template
-
-
 class Movie:
     """
     Class representing a movie
@@ -88,7 +84,7 @@ class Movie:
         result += f"🎭 {self.genres}\n\n"
 
         if self.trailer_url:
-            result += f'🔗 <a href="{self.trailer_url}">трейлер (YouTube)</a>\n'
+            result += f'🔗 <a href="{self.trailer_url}">Трейлер (YouTube)</a>\n'
         result += f"<blockquote expandable>{self.overview}</blockquote>\n\n"
 
         return result
@@ -129,76 +125,4 @@ class Movie:
             data["overview"],
             poster_url,
             data["trailer_url"],
-        )
-
-
-class AddToFavoritesMarkup(InlineKeyboardMarkup):
-    """
-    Class representing the inline keyboard markup containing a single button for adding a movie to favorites
-
-    Parameters
-    ----------
-    movie_id : int
-        The TMDB ID of the movie to add to favorites
-    """
-
-    def __init__(self, movie_id: int):
-        super().__init__(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=Template.FAVORITES_ADD_BUTTON,
-                        callback_data=f"favorites_add:{movie_id}",
-                    )
-                ],
-            ]
-        )
-
-
-class RemoveFromFavoritesMarkup(InlineKeyboardMarkup):
-    """
-    Class representing the inline keyboard markup containing a single button for removing a movie from favorites
-
-    Parameters
-    ----------
-    movie_id : int
-        The TMDB ID of the movie to remove from favorites
-    """
-
-    def __init__(self, movie_id: int):
-        super().__init__(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=Template.FAVORITES_REMOVE_BUTTON,
-                        callback_data=f"favorites_remove:{movie_id}",
-                    )
-                ],
-            ]
-        )
-
-
-class FavoritesMarkup(InlineKeyboardMarkup):
-    """
-    Class representing the inline keyboard markup for displaying a list of favorite movies in form of buttons
-
-    Used as an answer to the `/favorites` command
-
-    Parameters
-    ----------
-    movies : list[Movie]
-        A list of Movie objects
-    """
-
-    def __init__(self, movies: list[Movie]):
-        super().__init__(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=movie.title,
-                        callback_data=f"expand:{movie.movie_id}",
-                    )
-                ]
-                for movie in movies
-            ]
         )
