@@ -3,12 +3,14 @@ from aiogram import Dispatcher, types, F
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.markup import InfoInlineMarkup
+from modules.types.markup import InfoInlineMarkup, SearchResultInlineMarkup
 
 
 async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
-    command = callback.data.removeprefix("favorites_")
 
+    # parse callback data
+    from_search = callback.data.endswith("|search")
+    command = callback.data.removeprefix("favorites_").removesuffix("|search")
     movie_id = int(command.split(":")[1])
     action = command.split(":")[0]
 
@@ -16,12 +18,16 @@ async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
 
     if action == "add":
         await callback.answer(Template.FAVORITES_ADDED_ALERT)
-        markup = InfoInlineMarkup(movie_id, favorites_action="remove", from_expand=True)
+        anti_action = "remove"
     elif action == "remove":
         await callback.answer(Template.FAVORITES_REMOVED_ALERT)
-        markup = InfoInlineMarkup(movie_id, favorites_action="add", from_expand=True)
+        anti_action = "add"
 
-    # change the inline button respectively
+    # change the inline button respectively: if added, set remove and vice versa
+    if from_search:
+        markup = SearchResultInlineMarkup(movie_id, anti_action)
+    else:
+        markup = InfoInlineMarkup(movie_id, anti_action)
     await callback.message.edit_reply_markup(reply_markup=markup)
 
 
@@ -29,7 +35,7 @@ async def expand_from_favorites(callback: types.CallbackQuery, movie_api: MovieA
     movie_id = int(callback.data.removeprefix("expand:"))
     movie = movie_api.get_movie(movie_id)
 
-    markup = InfoInlineMarkup(movie_id, favorites_action="remove", from_expand=True)
+    markup = InfoInlineMarkup(movie_id, favorites_action="remove")
 
     await callback.message.answer_photo(
         photo=movie.poster_path,

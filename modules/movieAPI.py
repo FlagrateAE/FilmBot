@@ -64,7 +64,7 @@ class MovieAPI:
 
     def search(
         self, query: str, language: str = "uk-UA", include_adult: bool = False
-    ) -> Movie | None:
+    ) -> list[Movie] | None:
         """
         Searches for a movie using the specified query and returns the best match.
 
@@ -83,7 +83,7 @@ class MovieAPI:
             The best match movie, or None if no results were found.
         """
 
-        searchResults = self.api_call(
+        search_results: list[dict] = self.api_call(
             endpoint="/search/movie",
             params={
                 "query": query,
@@ -92,14 +92,16 @@ class MovieAPI:
             },
         )["results"]
 
-        if not searchResults:
+        if not search_results:
             return None
+        
+        movies = []
+        for movie_data in search_results:
+            trailer_url = self.get_trailer_url(movie_data["id"], language)
+            movie_data["trailer_url"] = trailer_url
+            movies.append(Movie.from_api(movie_data))
 
-        best_match = searchResults[0]
-        trailer_url = self.get_trailer_url(best_match["id"], language)
-        best_match["trailer_url"] = trailer_url
-
-        return Movie.from_api(best_match)
+        return movies
 
     def get_trailer_url(self, movie_id: int, language: str = "uk-UA") -> str | None:
         """

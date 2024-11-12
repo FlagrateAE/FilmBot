@@ -34,23 +34,7 @@ class InfoInlineMarkup(InlineKeyboardMarkup):
         self,
         movie_id: int,
         favorites_action: str,
-        from_expand: bool = False,
     ):
-        """
-        Class representing the inline keyboard markup to display under search result (found movie) message
-
-        Consists of 2 buttons: add the movie to or remove from favorites, show other search results (optional)
-
-        Parameters
-        ----------
-        movie_id : int
-            The ID of the movie
-        favorites_action : str
-            The action to display on the button: "add" or "remove" a movie from favorites
-        from_expand : bool, optional
-            Whether the message was derived from "expand" callback (if so, the "show more results" button will not be displayed). Defaults to False.
-
-        """
 
         if favorites_action == "add":
             favorites_button = InlineKeyboardButton(
@@ -63,22 +47,26 @@ class InfoInlineMarkup(InlineKeyboardMarkup):
                 callback_data=f"favorites_remove:{movie_id}",
             )
 
-        keyboard = [[favorites_button]]
-
-        if not from_expand:
-            keyboard.append(
-                [
-                    InlineKeyboardButton(
-                        text=Template.MORE_RESULTS_BUTTON,
-                        callback_data="show_more",
-                    )
-                ]
-            )
-
-        super().__init__(inline_keyboard=keyboard)
+        super().__init__(inline_keyboard=[[favorites_button]])
 
 
-class FavouriteListInlineMarkup(InlineKeyboardMarkup):
+class SearchResultInlineMarkup(InfoInlineMarkup):
+    def __init__(self, movie_id: int, favorites_action: str = "add"):
+        super().__init__(movie_id, favorites_action)
+
+        self.inline_keyboard[0][0].callback_data += "|search"
+
+        self.inline_keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=Template.MORE_RESULTS_BUTTON,
+                    callback_data="more_results",
+                )
+            ]
+        )
+
+
+class FavoritesInlineMarkup(InlineKeyboardMarkup):
     def __init__(self, movies: list[Movie]):
         """
         Class representing the inline keyboard markup for displaying a list of favorite movies in form of buttons
