@@ -116,7 +116,10 @@ class Movie:
                 genre_names.append(genre["name"])
         genres = ", ".join(genre_names).capitalize()
 
-        poster_url = f"https://image.tmdb.org/t/p/w500/{data['poster_path']}"
+        if data["poster_path"] is not None:
+            poster_url = f"https://image.tmdb.org/t/p/w500/{data['poster_path']}"
+        else: poster_url = None
+        
         rating: float = round(data["vote_average"], 1)
 
         return cls(

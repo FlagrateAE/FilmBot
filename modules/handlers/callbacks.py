@@ -37,11 +37,14 @@ async def expand_from_favorites(callback: types.CallbackQuery, movie_api: MovieA
 
     markup = InfoInlineMarkup(movie_id, favorites_action="remove")
 
-    await callback.message.answer_photo(
-        photo=movie.poster_path,
-        caption=movie.text,
-        reply_markup=markup,
-    )
+    if movie.poster_path:
+        await callback.message.answer_photo(
+            photo=movie.poster_path,
+            caption=movie.text,
+            reply_markup=markup,
+        )
+    else:
+        await callback.message.answer(text=movie.text, reply_markup=markup)
 
     await callback.answer()
 

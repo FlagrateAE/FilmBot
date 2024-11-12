@@ -25,6 +25,7 @@ async def search(
         query = message.text
 
     best_result = movie_api.search(query)[0]
+    print(best_result.poster_path)
 
     if not best_result:
         await message.answer(Template.SEARCH_NOT_FOUND)
@@ -39,11 +40,16 @@ async def search(
     markup = SearchResultInlineMarkup(
         movie_id=best_result.movie_id, favorites_action=action
     )
-    await message.answer_photo(
-        photo=best_result.poster_path,
-        caption=best_result.text,
-        reply_markup=markup,
-    )
+    
+    if best_result.poster_path:
+        await message.answer_photo(
+            photo=best_result.poster_path,
+            caption=best_result.text,
+            reply_markup=markup,
+        )
+    else:
+        await message.answer(text=best_result.text, reply_markup=markup)
+    
     await state.set_state(StateMachine.main_menu)
 
 
