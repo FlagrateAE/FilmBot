@@ -6,8 +6,10 @@ from aiogram.enums.parse_mode import ParseMode
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 
+from modules.handlers.general import setup as setup_general
 from modules.handlers.commands import setup as setup_commands
 from modules.handlers.callbacks import setup as setup_callbacks
+from modules.handlers.fsm import setup as setup_fsm
 
 import logging
 import os
@@ -24,8 +26,11 @@ async def main():
     db = FavoritesDB()
 
     dp = Dispatcher(db=db, movie_api=movie_api)
+    setup_general(dp)
     setup_commands(dp)
     setup_callbacks(dp)
+    setup_fsm(dp)
+    
 
     await dp.start_polling(bot)
 

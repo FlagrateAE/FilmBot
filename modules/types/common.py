@@ -1,3 +1,6 @@
+from aiogram.fsm.state import StatesGroup, State
+
+
 class Movie:
     """
     Class representing a movie
@@ -126,3 +129,8 @@ class Movie:
             poster_url,
             data["trailer_url"],
         )
+
+
+class StateMachine(StatesGroup):
+    main_menu = State()
+    search_input = State()
