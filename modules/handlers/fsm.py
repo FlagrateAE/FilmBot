@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.common import StateMachine
+from modules.types.common import SpecialStateMachine
 from modules.types.markup import FavoritesClearMarkup, MainMenuMarkup
 
 
@@ -17,7 +17,7 @@ async def search_start(message: types.Message, state: FSMContext):
     """
 
     await message.answer(Template.FSM_SEARCH_START)
-    await state.set_state(StateMachine.search_input)
+    await state.set_state(SpecialStateMachine.search_input)
 
 
 async def clear_confirm(message: types.Message, state: FSMContext, db: FavoritesDB):
@@ -32,7 +32,7 @@ async def clear_confirm(message: types.Message, state: FSMContext, db: Favorites
         await message.answer(
             text=Template.CLEAR_CONFIRM, reply_markup=FavoritesClearMarkup()
         )
-        await state.set_state(StateMachine.clear_confirm)
+        await state.set_state(SpecialStateMachine.clear_confirm)
     else:
         # no favorites to clear
         await message.answer(Template.FAVORITES_EMPTY)
@@ -42,40 +42,36 @@ async def clear_yes(message: types.Message, state: FSMContext, db: FavoritesDB):
     """
     Called on clear confiramtion by respective keyboard button. Clears user favorite movies list.
 
-    Sets `StateMachine.main_menu` state
+    Resets the state
     """
 
     db.clear_user_movies(message.from_user.id)
     await message.answer(text=Template.CLEAR_FINISHED, reply_markup=MainMenuMarkup())
-    await state.set_state(StateMachine.main_menu)
+    await state.set_state(None)
 
 
 async def clear_no(message: types.Message, state: FSMContext):
     """
     Called on clear refusal by respective keyboard button. Sends back to main menu.
 
-    Sets `StateMachine.main_menu` state
+    Resets the state
     """
 
     await message.answer(text=Template.CLEAR_CANCELLED, reply_markup=MainMenuMarkup())
-    await state.set_state(StateMachine.main_menu)
+    await state.set_state(None)
 
 
 def setup(dp: Dispatcher):
-    dp.message.register(
-        search_start, F.text == Template.SEARCH_BUTTON, StateMachine.main_menu
-    )
+    dp.message.register(search_start, F.text == Template.SEARCH_BUTTON)
+
+    dp.message.register(clear_confirm, F.text == Template.FAVORITES_CLEAR_BUTTON)
+    dp.message.register(clear_confirm, Command("clear_favorites"))
 
     dp.message.register(
-        clear_confirm, F.text == Template.FAVORITES_CLEAR_BUTTON, StateMachine.main_menu
+        clear_yes,
+        F.text == Template.CLEAR_YES_BUTTON,
+        SpecialStateMachine.clear_confirm,
     )
     dp.message.register(
-        clear_confirm, Command("clear_favorites"), StateMachine.main_menu
-    )
-
-    dp.message.register(
-        clear_yes, F.text == Template.CLEAR_YES_BUTTON, StateMachine.clear_confirm
-    )
-    dp.message.register(
-        clear_no, F.text == Template.CLEAR_NO_BUTTON, StateMachine.clear_confirm
+        clear_no, F.text == Template.CLEAR_NO_BUTTON, SpecialStateMachine.clear_confirm
     )

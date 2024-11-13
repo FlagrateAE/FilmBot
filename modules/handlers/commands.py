@@ -1,10 +1,10 @@
-from aiogram import Dispatcher, types
+from aiogram import Dispatcher, types, F
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.common import StateMachine
+from modules.types.common import SpecialStateMachine
 from modules.types.markup import MainMenuMarkup
 
 
@@ -14,15 +14,19 @@ async def start(message: types.Message, state: FSMContext, db: FavoritesDB):
 
     Creates new user instance in the database and sends welcome message
 
-    Sets `StateMachine.main_menu` state
+    Resets the state
     """
 
     try:
         db.new_user(message.from_user.id)
         await message.answer(text=Template.START, reply_markup=MainMenuMarkup())
-        await state.set_state(StateMachine.main_menu)
+        await state.set_state(None)
     except Exception as e:
         await message.answer(Template.START_DB_ERROR)
+
+
+async def help_msg(message: types.Message):
+    await message.answer(Template.HELP)
 
 
 async def get_all_data(message: types.Message, db: FavoritesDB):
@@ -37,5 +41,8 @@ async def get_all_data(message: types.Message, db: FavoritesDB):
 
 def setup(dp: Dispatcher):
     dp.message.register(start, Command("start"))
-
+    
+    dp.message.register(help_msg, Command("help"))
+    dp.message.register(help_msg, F.text == Template.HELP_BUTTON)
+    
     dp.message.register(get_all_data, Command("all"))

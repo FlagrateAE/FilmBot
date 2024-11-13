@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.common import StateMachine, Movie
+from modules.types.common import SpecialStateMachine, Movie
 from modules.types.markup import (
     InfoInlineMarkup,
     SearchResultInlineMarkup,
@@ -50,7 +50,7 @@ async def search(
     Called on `/search` command or on user input in `StateMachine.search_input` state.
     Searches using movie title and sends the best match to the user. Writes other results (if any) to state data
 
-    Sets `StateMachine.main_menu` state
+    Resets the state
     """
 
     if command:
@@ -60,6 +60,8 @@ async def search(
             await message.answer(Template.SEARCH_NO_ARGS)
     else:
         query = message.text
+    
+    
 
     results = movie_api.search(query)
 
@@ -86,7 +88,7 @@ async def search(
 
     await _send_movie(message, best_result, markup)
 
-    await state.set_state(StateMachine.main_menu)
+    await state.set_state(None)
     if len(results) > 1:
         await state.set_data({"other_results": results[1:]})
 
@@ -110,9 +112,7 @@ async def list_favorites(message: types.Message, movie_api: MovieAPI, db: Favori
 
 def setup(dp: Dispatcher):
     dp.message.register(search, Command("search"))
-    dp.message.register(search, F.text, StateMachine.search_input)
+    dp.message.register(search, F.text, SpecialStateMachine.search_input)
 
     dp.message.register(list_favorites, Command("favorites"))
-    dp.message.register(
-        list_favorites, F.text == Template.FAVORITES_SHOW_BUTTON, StateMachine.main_menu
-    )
+    dp.message.register(list_favorites, F.text == Template.FAVORITES_SHOW_BUTTON)

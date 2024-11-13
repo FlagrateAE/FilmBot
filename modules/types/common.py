@@ -135,16 +135,15 @@ class Movie:
         )
 
 
-class StateMachine(StatesGroup):
+class SpecialStateMachine(StatesGroup):
     """
-    Class representing a list of states for a finite state machine
+    Class representing a list of special states states for a finite state machine
 
     Has 3 states:
     - main_menu
     - search_input
     - clear_confirm
     """
-
-    main_menu = State()
+    
     search_input = State()
     clear_confirm = State()

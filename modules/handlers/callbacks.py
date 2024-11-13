@@ -15,7 +15,7 @@ async def show_more_results(
     """
     Called on a `show_more_results` callback (when user presses "Show more results" button unser a serach result).
 
-    Retureves full search resuls list from state and sends them to the user
+    Retureves full search results list from state data and sends them to the user
     """
 
     other_results: list[Movie] = (await state.get_data())["other_results"]
