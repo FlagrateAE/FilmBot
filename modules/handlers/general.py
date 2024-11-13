@@ -5,12 +5,25 @@ from aiogram.fsm.context import FSMContext
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.common import StateMachine
+from modules.types.common import StateMachine, Movie
 from modules.types.markup import (
     InfoInlineMarkup,
     SearchResultInlineMarkup,
     FavoritesInlineMarkup,
 )
+
+
+async def _send_movie(
+    message: types.Message, movie: Movie, markup: types.InlineKeyboardMarkup
+):
+    if movie.poster_path:
+        await message.answer_photo(
+            photo=movie.poster_path,
+            caption=movie.text,
+            reply_markup=markup,
+        )
+    else:
+        await message.answer(text=movie.text, reply_markup=markup)
 
 
 async def search(
@@ -51,14 +64,7 @@ async def search(
             movie_id=best_result.movie_id, favorites_action=action
         )
 
-    if best_result.poster_path:
-        await message.answer_photo(
-            photo=best_result.poster_path,
-            caption=best_result.text,
-            reply_markup=markup,
-        )
-    else:
-        await message.answer(text=best_result.text, reply_markup=markup)
+    await _send_movie(message, best_result, markup)
 
     await state.set_state(StateMachine.main_menu)
     if len(results) > 1:
