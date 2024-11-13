@@ -10,6 +10,17 @@ from modules.types.common import Movie
 
 
 class MainMenuMarkup(ReplyKeyboardMarkup):
+    """
+    Class representing a keyboard markup for the main menu.
+
+    Consists of 5 buttons:
+    - Search for a movie
+    - Show favorites list
+    - Show trending movies
+    - Clear favorites list
+    - Help
+    """
+
     def __init__(self):
         super().__init__(
             keyboard=[
@@ -30,11 +41,25 @@ class MainMenuMarkup(ReplyKeyboardMarkup):
 
 
 class InfoInlineMarkup(InlineKeyboardMarkup):
+    """
+    Class representing an inline keyboard markup to display under a movie info
+
+    Consists of a single button with either "Add to favorites" or "Remove from favorites"
+    """
+
     def __init__(
         self,
         movie_id: int,
         favorites_action: str,
     ):
+        """
+        Parameters
+        ----------
+        movie_id : int
+            The ID of the movie.
+        favorites_action : str
+            Either "add" or "remove"
+        """
 
         if favorites_action == "add":
             favorites_button = InlineKeyboardButton(
@@ -51,7 +76,24 @@ class InfoInlineMarkup(InlineKeyboardMarkup):
 
 
 class SearchResultInlineMarkup(InfoInlineMarkup):
+    """
+    Class representing an inline keyboard markup to display under a movie info dervied from search
+
+    Conists of 2 buttons:
+    - Either "Add to favorites" or "Remove from favorites"
+    - "Show more results"
+    """
+
     def __init__(self, movie_id: int, favorites_action: str = "add"):
+        """
+        Parameters
+        ----------
+        movie_id : int
+            The ID of the movie.
+        favorites_action : str
+            Either "add" or "remove"
+        """
+
         super().__init__(movie_id, favorites_action)
 
         self.inline_keyboard[0][0].callback_data += "|search"
@@ -93,6 +135,14 @@ class FavoritesInlineMarkup(InlineKeyboardMarkup):
 
 
 class FavoritesClearMarkup(ReplyKeyboardMarkup):
+    """
+    Class representing a keyboard markup for user to make a decision wheter to clear their favorites list
+
+    Consists of a 2 buttons:
+    - Approve
+    - Disapprove
+    """
+
     def __init__(self):
         super().__init__(
             keyboard=[

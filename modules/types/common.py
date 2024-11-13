@@ -118,8 +118,9 @@ class Movie:
 
         if data["poster_path"] is not None:
             poster_url = f"https://image.tmdb.org/t/p/w500/{data['poster_path']}"
-        else: poster_url = None
-        
+        else:
+            poster_url = None
+
         rating: float = round(data["vote_average"], 1)
 
         return cls(
@@ -135,6 +136,15 @@ class Movie:
 
 
 class StateMachine(StatesGroup):
+    """
+    Class representing a list of states for a finite state machine
+
+    Has 3 states:
+    - main_menu
+    - search_input
+    - clear_confirm
+    """
+
     main_menu = State()
     search_input = State()
     clear_confirm = State()
