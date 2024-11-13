@@ -102,6 +102,13 @@ class FavoritesDB:
         else:
             print("User already exists")
 
+    def clear_user_movies(self, user_id: int):
+        self.cursor.execute(
+            "UPDATE favorites SET movies = ? WHERE user_id = ?",
+            ("[]", user_id),
+        )
+        self.conn.commit()
+
     def get_all(self):
         self.cursor.execute("SELECT * FROM favorites")
         return self.cursor.fetchall()

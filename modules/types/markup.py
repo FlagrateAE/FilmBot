@@ -90,3 +90,16 @@ class FavoritesInlineMarkup(InlineKeyboardMarkup):
                 for movie in movies
             ]
         )
+
+
+class FavoritesClearMarkup(ReplyKeyboardMarkup):
+    def __init__(self):
+        super().__init__(
+            keyboard=[
+                [
+                    KeyboardButton(text=Template.CLEAR_YES_BUTTON),
+                    KeyboardButton(text=Template.CLEAR_NO_BUTTON),
+                ],
+            ],
+            resize_keyboard=True,
+        )

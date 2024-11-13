@@ -137,3 +137,4 @@ class Movie:
 class StateMachine(StatesGroup):
     main_menu = State()
     search_input = State()
+    clear_confirm = State()
