@@ -12,6 +12,12 @@ from modules.handlers.general import _send_movie
 async def show_more_results(
     callback: types.CallbackQuery, state: FSMContext, db: FavoritesDB
 ):
+    """
+    Called on a `show_more_results` callback (when user presses "Show more results" button unser a serach result).
+
+    Retureves full search resuls list from state and sends them to the user
+    """
+
     other_results: list[Movie] = (await state.get_data())["other_results"]
     await callback.message.answer(Template.MORE_RESULTS_SHOW + str(len(other_results)))
 
@@ -30,6 +36,11 @@ async def show_more_results(
 
 
 async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
+    """
+    Called on a `favorites:<action>:<movie_id>` callback (when user presses "Add to favorites" or "Remove from favorites" button under a movie info).
+
+    Updates user favorite movies list and reverts the callback button (for example, if user adds a movie to favorites, the "Add to favorites" button will be changed to "Remove from favorites")
+    """
 
     # parse callback data
     from_search = callback.data.endswith("|search")
@@ -55,6 +66,12 @@ async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
 
 
 async def expand_from_favorites(callback: types.CallbackQuery, movie_api: MovieAPI):
+    """
+    Called on an `expand:<movie_id>` callback (when user presses a movie button in a favorites list from `/favorites` command).
+    
+    Looks up movie data via API and sends back
+    """
+    
     movie_id = int(callback.data.removeprefix("expand:"))
     movie = movie_api.get_movie(movie_id)
 

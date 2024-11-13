@@ -9,11 +9,25 @@ from modules.types.markup import FavoritesClearMarkup, MainMenuMarkup
 
 
 async def search_start(message: types.Message, state: FSMContext):
+    """
+    Called on search button pressed in main menu.
+    Starts a search process
+
+    Sets `StateMachine.search_input` state
+    """
+
     await message.answer(Template.FSM_SEARCH_START)
     await state.set_state(StateMachine.search_input)
 
 
 async def clear_confirm(message: types.Message, state: FSMContext, db: FavoritesDB):
+    """
+    Called on clear button pressed in main menu.
+    Start a clear confirmation dialog
+
+    Sets `StateMachine.clear_confirm` state
+    """
+
     if db.get_user_movies(message.from_user.id):
         await message.answer(
             text=Template.CLEAR_CONFIRM, reply_markup=FavoritesClearMarkup()
@@ -25,12 +39,24 @@ async def clear_confirm(message: types.Message, state: FSMContext, db: Favorites
 
 
 async def clear_yes(message: types.Message, state: FSMContext, db: FavoritesDB):
+    """
+    Called on clear confiramtion by respective keyboard button. Clears user favorite movies list.
+
+    Sets `StateMachine.main_menu` state
+    """
+
     db.clear_user_movies(message.from_user.id)
     await message.answer(text=Template.CLEAR_FINISHED, reply_markup=MainMenuMarkup())
     await state.set_state(StateMachine.main_menu)
 
 
 async def clear_no(message: types.Message, state: FSMContext):
+    """
+    Called on clear refusal by respective keyboard button. Sends back to main menu.
+
+    Sets `StateMachine.main_menu` state
+    """
+
     await message.answer(text=Template.CLEAR_CANCELLED, reply_markup=MainMenuMarkup())
     await state.set_state(StateMachine.main_menu)
 
