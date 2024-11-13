@@ -94,9 +94,10 @@ class MovieAPI:
 
         if not search_results:
             return None
-        
+
         movies = []
-        for movie_data in search_results:
+        for movie_data in search_results[:6]:
+            # only first 6 results (1 shown immedeiately, 5 more on show_more_results button)
             trailer_url = self.get_trailer_url(movie_data["id"], language)
             movie_data["trailer_url"] = trailer_url
             movies.append(Movie.from_api(movie_data))

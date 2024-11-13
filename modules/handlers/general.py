@@ -6,7 +6,11 @@ from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
 from modules.types.common import StateMachine
-from modules.types.markup import SearchResultInlineMarkup, FavoritesInlineMarkup
+from modules.types.markup import (
+    InfoInlineMarkup,
+    SearchResultInlineMarkup,
+    FavoritesInlineMarkup,
+)
 
 
 async def search(
@@ -24,12 +28,13 @@ async def search(
     else:
         query = message.text
 
-    best_result = movie_api.search(query)[0]
-    print(best_result.poster_path)
+    results = movie_api.search(query)
 
-    if not best_result:
+    if not results:
         await message.answer(Template.SEARCH_NOT_FOUND)
         return
+
+    best_result = results[0]
 
     action = (
         "add"
@@ -37,10 +42,15 @@ async def search(
         else "remove"
     )
 
-    markup = SearchResultInlineMarkup(
-        movie_id=best_result.movie_id, favorites_action=action
-    )
-    
+    if len(results) > 1:
+        markup = SearchResultInlineMarkup(
+            movie_id=best_result.movie_id, favorites_action=action
+        )
+    else:
+        markup = InfoInlineMarkup(
+            movie_id=best_result.movie_id, favorites_action=action
+        )
+
     if best_result.poster_path:
         await message.answer_photo(
             photo=best_result.poster_path,
@@ -49,8 +59,10 @@ async def search(
         )
     else:
         await message.answer(text=best_result.text, reply_markup=markup)
-    
+
     await state.set_state(StateMachine.main_menu)
+    if len(results) > 1:
+        await state.set_data({"other_results": results[1:]})
 
 
 async def list_favorites(message: types.Message, movie_api: MovieAPI, db: FavoritesDB):

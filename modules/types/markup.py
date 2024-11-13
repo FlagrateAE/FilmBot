@@ -60,7 +60,7 @@ class SearchResultInlineMarkup(InfoInlineMarkup):
             [
                 InlineKeyboardButton(
                     text=Template.MORE_RESULTS_BUTTON,
-                    callback_data="more_results",
+                    callback_data="show_more_results",
                 )
             ]
         )
