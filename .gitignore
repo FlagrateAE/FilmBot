@@ -1,8 +1,8 @@
 # SQLite3 database
 *.db
 
-# My test file
-test.py
+# Config file
+config.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
