@@ -25,7 +25,7 @@ class MovieAPI:
     api_call(endpoint, params) -> dict
         Makes an HTTP GET request to the TMDB API.
 
-    search(query, language, include_adult) -> Movie | None
+    search(query, language) -> Movie | None
         Searches for a movie using the specified query and returns the best match.
 
     get_trailer_url(movie_id, language) -> str | None
@@ -62,9 +62,7 @@ class MovieAPI:
 
         return response.json()
 
-    def search(
-        self, query: str, language: str = "uk-UA", include_adult: bool = False
-    ) -> list[Movie] | None:
+    def search(self, query: str, language: str = "uk-UA") -> list[Movie] | None:
         """
         Searches for a movie using the specified query and returns the best match.
 
@@ -74,8 +72,6 @@ class MovieAPI:
             The query to search for.
         language : str, optional
             The language to search in. Defaults to "uk-UA" (Ukrainian).
-        include_adult : bool, optional
-            Whether to include adult movies in the search results. Defaults to False.
 
         Returns
         -------
@@ -88,7 +84,6 @@ class MovieAPI:
             params={
                 "query": query,
                 "language": language,
-                "include_adult": str(include_adult),
             },
         )["results"]
 
@@ -98,6 +93,36 @@ class MovieAPI:
         movies = []
         for movie_data in search_results[:6]:
             # only first 6 results (1 shown immedeiately, 5 more on show_more_results button)
+            trailer_url = self.get_trailer_url(movie_data["id"], language)
+            movie_data["trailer_url"] = trailer_url
+            movies.append(Movie.from_api(movie_data))
+
+        return movies
+
+    def get_trending(self, language: str = "uk-UA") -> list[Movie]:
+        """
+        Returns a list of currently trending movies.
+
+        Parameters
+        ----------
+        language : str, optional
+            The language to search in. Defaults to "uk-UA" (Ukrainian).
+
+        Returns
+        -------
+        list[Movie]
+            A list of Movie objects representing the currently trending movies
+        """
+
+        trending = self.api_call(
+            endpoint="/trending/movie/week",
+            params={
+                "language": language,
+            },
+        )["results"]
+
+        movies = []
+        for movie_data in trending[:7]:
             trailer_url = self.get_trailer_url(movie_data["id"], language)
             movie_data["trailer_url"] = trailer_url
             movies.append(Movie.from_api(movie_data))

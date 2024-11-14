@@ -1,6 +1,7 @@
 from aiogram import Dispatcher, types, F
 from aiogram.filters.command import Command, CommandObject
 from aiogram.fsm.context import FSMContext
+from aiogram.utils.media_group import MediaGroupBuilder
 
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
@@ -10,6 +11,7 @@ from modules.types.markup import (
     InfoInlineMarkup,
     SearchResultInlineMarkup,
     FavoritesInlineMarkup,
+    TrendingInlineMarkup,
 )
 
 
@@ -60,8 +62,6 @@ async def search(
             await message.answer(Template.SEARCH_NO_ARGS)
     else:
         query = message.text
-    
-    
 
     results = movie_api.search(query)
 
@@ -110,9 +110,33 @@ async def list_favorites(message: types.Message, movie_api: MovieAPI, db: Favori
     await message.answer(text=Template.FAVORITES_SHOW_BUTTON, reply_markup=markup)
 
 
+async def trending(message: types.Message, movie_api: MovieAPI):
+    """
+    Called on `/trending` command or on the corresponding button in main menu.
+
+    Sends the user a list of 7 currently trending movies in a form of 2 messages:
+    - Group of poster photos
+    - One text message with brief movies info and inline buttons to retrieve further info
+    """
+
+    trending = movie_api.get_trending()
+
+    media_group = MediaGroupBuilder()
+    text = ""
+
+    for i, movie in enumerate(trending):
+        media_group.add_photo(media=movie.poster_path)
+        text += f"<b>{i + 1}.</b> {movie.text_brief}\n"
+
+    await message.answer_media_group(media=media_group.build())
+    await message.answer(text, reply_markup=TrendingInlineMarkup(trending))
+
 def setup(dp: Dispatcher):
     dp.message.register(search, Command("search"))
     dp.message.register(search, F.text, SpecialStateMachine.search_input)
 
     dp.message.register(list_favorites, Command("favorites"))
     dp.message.register(list_favorites, F.text == Template.FAVORITES_SHOW_BUTTON)
+
+    dp.message.register(trending, Command("trending"))
+    dp.message.register(trending, F.text == Template.TRENDING_BUTTON)

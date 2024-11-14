@@ -126,10 +126,63 @@ class FavoritesInlineMarkup(InlineKeyboardMarkup):
                 [
                     InlineKeyboardButton(
                         text=movie.title,
-                        callback_data=f"expand:{movie.movie_id}",
+                        callback_data=f"expand_favorites:{movie.movie_id}",
                     )
                 ]
                 for movie in movies
+            ]
+        )
+
+
+class TrendingInlineMarkup(InlineKeyboardMarkup):
+    def __init__(self, movies: list[Movie]):
+        """
+        Class representing the inline keyboard markup for displaying a list of 7 trending movies in form of buttons
+
+        Used as an answer to the `/trending` command
+
+        Parameters
+        ----------
+        movies : list[Movie]
+            A list of 7 Movie objects representing trending now movies
+        """
+
+        super().__init__(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=movies[0].title,
+                        callback_data=f"expand_trending:{movies[0].movie_id}",
+                    ),
+                    InlineKeyboardButton(
+                        text=movies[1].title,
+                        callback_data=f"expand_trending:{movies[1].movie_id}",
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        text=movies[2].title,
+                        callback_data=f"expand_trending:{movies[2].movie_id}",
+                    ),
+                    InlineKeyboardButton(
+                        text=movies[3].title,
+                        callback_data=f"expand_trending:{movies[3].movie_id}",
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        text=movies[4].title,
+                        callback_data=f"expand_trending:{movies[4].movie_id}",
+                    ),
+                    InlineKeyboardButton(
+                        text=movies[5].title,
+                        callback_data=f"expand_trending:{movies[5].movie_id}",
+                    ),
+                    InlineKeyboardButton(
+                        text=movies[6].title,
+                        callback_data=f"expand_trending:{movies[6].movie_id}",
+                    ),
+                ],
             ]
         )
 

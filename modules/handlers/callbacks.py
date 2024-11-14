@@ -65,17 +65,35 @@ async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
     await callback.message.edit_reply_markup(reply_markup=markup)
 
 
-async def expand_from_favorites(callback: types.CallbackQuery, movie_api: MovieAPI):
+async def expand_from_button(
+    callback: types.CallbackQuery,
+    movie_api: MovieAPI,
+    db: FavoritesDB,
+    from_trending: bool = False,
+):
     """
-    Called on an `expand:<movie_id>` callback (when user presses a movie button in a favorites list from `/favorites` command).
-    
+    Called on an `expand_<from>:<movie_id>` callback (when user presses a movie button in a favorites or trending lists).
+    <from> is either "favorites" or "trending"
+
     Looks up movie data via API and sends back
     """
-    
-    movie_id = int(callback.data.removeprefix("expand:"))
+
+    command = callback.data.removeprefix("expand_")
+    source = command.split(":")[0]
+    movie_id = int(command.split(":")[1])
     movie = movie_api.get_movie(movie_id)
 
-    markup = InfoInlineMarkup(movie_id, favorites_action="remove")
+    if source == "trending":
+        action = (
+            "add"
+            if movie_id not in db.get_user_movies(callback.from_user.id)
+            else "remove"
+        )
+    elif source == "favorites":
+        # only remove action available
+        action = "remove"
+    
+    markup = InfoInlineMarkup(movie_id, favorites_action=action)
 
     await _send_movie(callback.message, movie, markup)
 
@@ -85,4 +103,4 @@ async def expand_from_favorites(callback: types.CallbackQuery, movie_api: MovieA
 def setup(dp: Dispatcher):
     dp.callback_query.register(show_more_results, F.data == "show_more_results")
     dp.callback_query.register(update_favorites, F.data.startswith("favorites"))
-    dp.callback_query.register(expand_from_favorites, F.data.startswith("expand"))
+    dp.callback_query.register(expand_from_button, F.data.startswith("expand"))

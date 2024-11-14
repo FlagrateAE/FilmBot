@@ -92,6 +92,29 @@ class Movie:
 
         return result
 
+    @property
+    def text_brief(self) -> str:
+        """
+        A brief formatted text representation of the movie for Telegram
+
+        Returns
+        -------
+        str
+            A brief formatted text representation of the movie
+        """
+
+        result = ""
+
+        result += f"🎬 <b>{self.title}</b>\n"
+        result += f"🎭 {self.genres}\n"
+        
+        if self.overview:
+            result += f"<blockquote expandable>{self.overview}</blockquote>\n"
+        else:
+            result += "<i>Немає опису</i>\n"
+
+        return result
+
     @classmethod
     def from_api(cls, data: dict):
         """
@@ -144,6 +167,6 @@ class SpecialStateMachine(StatesGroup):
     - search_input
     - clear_confirm
     """
-    
+
     search_input = State()
     clear_confirm = State()
