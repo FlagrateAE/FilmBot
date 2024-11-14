@@ -147,44 +147,23 @@ class TrendingInlineMarkup(InlineKeyboardMarkup):
             A list of 7 Movie objects representing trending now movies
         """
 
-        super().__init__(
-            inline_keyboard=[
-                [
+        # This is a pretty inline keyboard layout for 7 buttons (representing 7 trending movies). The layout is as it is because of how Telegram lays out a group of images (those are posters images corresponding to buttons)
+        INLINE_KEYBOARD_LAYOUT = [[0, 1], [2, 3], [4, 5, 6]]
+
+        keyboard = []
+
+        for layout_row in INLINE_KEYBOARD_LAYOUT:
+            row = []
+            for i in layout_row:
+                row.append(
                     InlineKeyboardButton(
-                        text=movies[0].title,
-                        callback_data=f"expand_trending:{movies[0].movie_id}",
-                    ),
-                    InlineKeyboardButton(
-                        text=movies[1].title,
-                        callback_data=f"expand_trending:{movies[1].movie_id}",
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        text=movies[2].title,
-                        callback_data=f"expand_trending:{movies[2].movie_id}",
-                    ),
-                    InlineKeyboardButton(
-                        text=movies[3].title,
-                        callback_data=f"expand_trending:{movies[3].movie_id}",
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        text=movies[4].title,
-                        callback_data=f"expand_trending:{movies[4].movie_id}",
-                    ),
-                    InlineKeyboardButton(
-                        text=movies[5].title,
-                        callback_data=f"expand_trending:{movies[5].movie_id}",
-                    ),
-                    InlineKeyboardButton(
-                        text=movies[6].title,
-                        callback_data=f"expand_trending:{movies[6].movie_id}",
-                    ),
-                ],
-            ]
-        )
+                        text=movies[i].title,
+                        callback_data=f"expand_trending:{movies[i].movie_id}",
+                    )
+                )
+            keyboard.append(row)
+
+        super().__init__(inline_keyboard=keyboard)
 
 
 class FavoritesClearMarkup(ReplyKeyboardMarkup):
