@@ -8,11 +8,6 @@ class MovieAPI:
 
     This class handles HTTP requests to the TMDB API and returns movie information.
 
-    Parameters
-    ----------
-    access_token : str
-        The access token for the TMDB API.
-
     Attributes
     ----------
     BASE_URL : str
@@ -35,6 +30,14 @@ class MovieAPI:
     BASE_URL = "https://api.themoviedb.org/3"
 
     def __init__(self, access_token: str):
+        """
+        Initialize the MovieAPI class.
+
+        Parameters
+        ----------
+        access_token : str
+            The access token for the TMDB API.
+        """
         self.headers = {
             "Authorization": "Bearer " + access_token,
             "Accept": "application/json",

@@ -3,7 +3,40 @@ import json
 
 
 class FavoritesDB:
+    """
+    Class to interact with the SQLite database.
+
+    Attributes
+    ----------
+    db_path : str
+        The path to the database file.
+
+    Methods
+    -------
+    init_db()
+        Initialize the database and create the favorites table if it doesn't exist.
+    update_movies_in_user(user_id, action, movie_id)
+        Update a user's favorite movies list
+    get_user_movies(user_id)
+        Get the list of favorite movies for a user
+    new_user(user_id)
+        Create a new user with an empty movies list (on /start command)
+    clear_user_movies(user_id)
+        Clear a user's favorite movies list
+    get_all()
+        Get all users and their favorite movies (admin command)
+    """
+
     def __init__(self, db_path):
+        """
+        Initialize the FavoritesDB class
+
+        Parameters
+        ----------
+        db_path : str
+            The path to the database file.
+        """
+        
         self.db_path = db_path
         self.init_db()
 
@@ -84,7 +117,7 @@ class FavoritesDB:
             return json.loads(result[0])
         return None
 
-    def new_user(self, user_id: int) -> bool:
+    def new_user(self, user_id: int):
         """
         Create a new user with an empty movies list (on /start command)
 
@@ -93,22 +126,39 @@ class FavoritesDB:
         user_id : int
             The Telegram ID of the user.
         """
+        
         if self.get_user_movies(user_id) == None:
             self.cursor.execute(
                 "INSERT INTO favorites (user_id, movies) VALUES (?, ?)",
                 (user_id, "[]"),
             )
             self.conn.commit()
-        else:
-            print("User already exists")
 
     def clear_user_movies(self, user_id: int):
+        """
+        Clear a user's favorite movies list
+
+        Parameters
+        ----------
+        user_id : int
+            The Telegram ID of the user.
+        """
+        
         self.cursor.execute(
             "UPDATE favorites SET movies = ? WHERE user_id = ?",
             ("[]", user_id),
         )
         self.conn.commit()
 
-    def get_all(self):
+    def get_all(self) -> list[tuple[int, list[int]]]:
+        """
+        Get all users and their favorite movies (admin command). Use during development and at low scales of the database because of message length limitation.
+
+        Returns
+        -------
+        list[tuple[int, list[int]]]
+            A list of tuples containing user IDs and their favorite movie IDs.
+        """
+        
         self.cursor.execute("SELECT * FROM favorites")
         return self.cursor.fetchall()
