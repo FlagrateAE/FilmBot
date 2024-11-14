@@ -88,7 +88,10 @@ class Movie:
 
         if self.trailer_url:
             result += f'🔗 <a href="{self.trailer_url}">Трейлер (YouTube)</a>\n'
-        result += f"<blockquote expandable>{self.overview}</blockquote>\n\n"
+        if self.overview:
+            result += f"<blockquote expandable>{self.overview}</blockquote>\n\n"
+        else:
+            result += "<i>Немає опису</i>\n\n"
 
         return result
 
@@ -107,7 +110,7 @@ class Movie:
 
         result += f"🎬 <b>{self.title}</b>\n"
         result += f"🎭 {self.genres}\n"
-        
+
         if self.overview:
             result += f"<blockquote expandable>{self.overview}</blockquote>\n"
         else:
@@ -151,7 +154,7 @@ class Movie:
             data["title"],
             genres,
             rating,
-            data["release_date"][:4],  # year
+            data["release_date"][:4],  # year (from format YYYY-MM-DD)
             data["overview"],
             poster_url,
             data["trailer_url"],
