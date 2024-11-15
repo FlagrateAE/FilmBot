@@ -21,7 +21,12 @@ async def show_more_results(
     Retureves full search results list from state data and sends them to the user
     """
     other_ids = callback.data.removeprefix("others:").split(",")
-    other_results = movie_api.movie_factory(other_ids)
+    
+    try:
+        other_results = movie_api.movie_factory(other_ids)
+    except KeyError:
+        await callback.answer(Template.ERROR)
+        return
     
     await callback.message.answer(Template.MORE_RESULTS_SHOW + str(len(other_results)))
 
