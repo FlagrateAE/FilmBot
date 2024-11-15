@@ -7,6 +7,8 @@ from modules.messageTemplates import Template
 from modules.types.common import SpecialStateMachine
 from modules.types.markup import MainMenuMarkup
 
+import config
+
 
 async def start(message: types.Message, state: FSMContext, db: FavoritesDB):
     """
@@ -35,8 +37,10 @@ async def get_all_data(message: types.Message, db: FavoritesDB):
 
     Sends back all the data in the database
     """
-
-    await message.answer(str(db.get_all()))
+    if not message.from_user.id in config.ADMINS:
+        await message.answer(Template.ACCESS_DENIED)
+    else:
+        await message.answer(str(db.get_all()))
 
 
 def setup(dp: Dispatcher):
