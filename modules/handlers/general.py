@@ -60,6 +60,7 @@ async def search(
             query = command.args
         else:
             await message.answer(Template.SEARCH_NO_ARGS)
+            return
     else:
         query = message.text
 
