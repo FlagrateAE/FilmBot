@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
 from modules.types.common import SpecialStateMachine
-from modules.types.markup import FavoritesClearMarkup, MainMenuMarkup
+from modules.types.markup import ClearConfirmMarkup, MainMenuMarkup
 
 
 async def search_start(message: types.Message, state: FSMContext):
@@ -30,7 +30,7 @@ async def clear_confirm(message: types.Message, state: FSMContext, db: Favorites
 
     if db.get_user_movies(message.from_user.id):
         await message.answer(
-            text=Template.CLEAR_CONFIRM, reply_markup=FavoritesClearMarkup()
+            text=Template.CLEAR_CONFIRM, reply_markup=ClearConfirmMarkup()
         )
         await state.set_state(SpecialStateMachine.clear_confirm)
     else:

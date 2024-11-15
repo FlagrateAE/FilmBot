@@ -78,8 +78,12 @@ async def search(
     )
 
     if len(results) > 1:
+        other_ids = [result.movie_id for result in results[1:]]
+
         markup = SearchResultInlineMarkup(
-            movie_id=best_result.movie_id, favorites_action=action
+            movie_id=best_result.movie_id,
+            favorites_action=action,
+            other_results_ids=other_ids,
         )
     else:
         markup = InfoInlineMarkup(
@@ -130,6 +134,7 @@ async def trending(message: types.Message, movie_api: MovieAPI):
 
     await message.answer_media_group(media=media_group.build())
     await message.answer(text, reply_markup=TrendingInlineMarkup(trending))
+
 
 def setup(dp: Dispatcher):
     dp.message.register(search, Command("search"))

@@ -10,15 +10,19 @@ from modules.handlers.general import _send_movie
 
 
 async def show_more_results(
-    callback: types.CallbackQuery, state: FSMContext, db: FavoritesDB
+    callback: types.CallbackQuery,
+    state: FSMContext,
+    movie_api: MovieAPI,
+    db: FavoritesDB,
 ):
     """
     Called on a `show_more_results` callback (when user presses "Show more results" button unser a serach result).
 
     Retureves full search results list from state data and sends them to the user
     """
-
-    other_results: list[Movie] = (await state.get_data())["other_results"]
+    other_ids = callback.data.removeprefix("others:").split(",")
+    other_results = movie_api.movie_factory(other_ids)
+    
     await callback.message.answer(Template.MORE_RESULTS_SHOW + str(len(other_results)))
 
     for result in other_results:
@@ -92,7 +96,7 @@ async def expand_from_button(
     elif source == "favorites":
         # only remove action available
         action = "remove"
-    
+
     markup = InfoInlineMarkup(movie_id, favorites_action=action)
 
     await _send_movie(callback.message, movie, markup)
@@ -101,6 +105,6 @@ async def expand_from_button(
 
 
 def setup(dp: Dispatcher):
-    dp.callback_query.register(show_more_results, F.data == "show_more_results")
+    dp.callback_query.register(show_more_results, F.data.startswith("others:"))
     dp.callback_query.register(update_favorites, F.data.startswith("favorites"))
     dp.callback_query.register(expand_from_button, F.data.startswith("expand"))

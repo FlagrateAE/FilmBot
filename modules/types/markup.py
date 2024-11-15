@@ -84,7 +84,12 @@ class SearchResultInlineMarkup(InfoInlineMarkup):
     - "Show more results"
     """
 
-    def __init__(self, movie_id: int, favorites_action: str = "add"):
+    def __init__(
+        self,
+        movie_id: int,
+        favorites_action: str = "add",
+        other_results_ids: list[int] = [],
+    ):
         """
         Parameters
         ----------
@@ -92,17 +97,21 @@ class SearchResultInlineMarkup(InfoInlineMarkup):
             The ID of the movie.
         favorites_action : str
             Either "add" or "remove"
+        other_results_ids : list[int]
+            If used from search, list of unshown results (moviis IDs)  to show when corresponding button is pressed
         """
 
         super().__init__(movie_id, favorites_action)
 
+        ids = ",".join(map(str, other_results_ids))
+        # mark the buttons as from search
         self.inline_keyboard[0][0].callback_data += "|search"
 
         self.inline_keyboard.append(
             [
                 InlineKeyboardButton(
                     text=Template.MORE_RESULTS_BUTTON,
-                    callback_data="show_more_results",
+                    callback_data="others:" + ids,
                 )
             ]
         )
@@ -166,7 +175,7 @@ class TrendingInlineMarkup(InlineKeyboardMarkup):
         super().__init__(inline_keyboard=keyboard)
 
 
-class FavoritesClearMarkup(ReplyKeyboardMarkup):
+class ClearConfirmMarkup(ReplyKeyboardMarkup):
     """
     Class representing a keyboard markup for user to make a decision wheter to clear their favorites list
 
