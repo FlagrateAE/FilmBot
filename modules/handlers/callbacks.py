@@ -4,14 +4,12 @@ from aiogram.fsm.context import FSMContext
 from modules.movieAPI import MovieAPI
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.common import Movie
 from modules.types.markup import InfoInlineMarkup, SearchResultInlineMarkup
 from modules.handlers.general import _send_movie
 
 
 async def show_more_results(
     callback: types.CallbackQuery,
-    state: FSMContext,
     movie_api: MovieAPI,
     db: FavoritesDB,
 ):
@@ -78,7 +76,6 @@ async def expand_from_button(
     callback: types.CallbackQuery,
     movie_api: MovieAPI,
     db: FavoritesDB,
-    from_trending: bool = False,
 ):
     """
     Called on an `expand_<from>:<movie_id>` callback (when user presses a movie button in a favorites or trending lists).

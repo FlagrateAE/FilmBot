@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 
 from modules.database import FavoritesDB
 from modules.messageTemplates import Template
-from modules.types.common import SpecialStateMachine
 from modules.types.markup import MainMenuMarkup
 
 import config
@@ -45,8 +44,8 @@ async def get_all_data(message: types.Message, db: FavoritesDB):
 
 def setup(dp: Dispatcher):
     dp.message.register(start, Command("start"))
-    
+
     dp.message.register(help_msg, Command("help"))
     dp.message.register(help_msg, F.text == Template.HELP_BUTTON)
-    
+
     dp.message.register(get_all_data, Command("all"))
