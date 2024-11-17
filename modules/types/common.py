@@ -83,8 +83,8 @@ class Movie:
         result += f"🎬 <b>{self.title}</b>\n\n"
 
         result += f"⭐️ {self.rating}\n" if self.rating != 0 else f"⭐️ Немає рейтингу\n"
-        result += f"📅 {self.year}\n"
-        result += f"🎭 {self.genres}\n\n"
+        result += f"🎭 {self.genres}\n"
+        result += f"📅 {self.year}\n\n"
 
         if self.trailer_url:
             result += f'🔗 <a href="{self.trailer_url}">Трейлер (YouTube)</a>\n'
