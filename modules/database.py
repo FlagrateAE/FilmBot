@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import logging
 
 
 class FavoritesDB:
@@ -133,6 +134,8 @@ class FavoritesDB:
                 (user_id, "[]"),
             )
             self.conn.commit()
+            logging.info(f"New user: {user_id}")
+
 
     def clear_user_movies(self, user_id: int):
         """
