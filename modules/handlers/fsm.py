@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types, F
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 
-from modules.database import FavoritesRedis
+from modules.services.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.common import SpecialStateMachine
 from modules.types.markup import ClearConfirmMarkup, MainMenuMarkup

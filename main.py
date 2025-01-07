@@ -3,8 +3,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 
-from modules.movieAPI import MovieAPI
-from modules.database import FavoritesRedis
+from modules.services.movieAPI import MovieAPI
+from modules.services.database import FavoritesRedis
 
 from modules.handlers.general import setup as setup_general
 from modules.handlers.commands import setup as setup_commands

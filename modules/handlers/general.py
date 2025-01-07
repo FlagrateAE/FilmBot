@@ -3,8 +3,8 @@ from aiogram.filters.command import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.media_group import MediaGroupBuilder
 
-from modules.movieAPI import MovieAPI
-from modules.database import FavoritesRedis
+from modules.services.movieAPI import MovieAPI
+from modules.services.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.common import SpecialStateMachine, Movie
 from modules.types.markup import (

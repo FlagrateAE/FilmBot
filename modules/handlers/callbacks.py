@@ -1,7 +1,7 @@
 from aiogram import Dispatcher, types, F
 
-from modules.movieAPI import MovieAPI
-from modules.database import FavoritesRedis
+from modules.services.movieAPI import MovieAPI
+from modules.services.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.markup import InfoInlineMarkup, SearchResultInlineMarkup
 from modules.handlers.general import _send_movie
