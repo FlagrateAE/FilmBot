@@ -1,8 +1,7 @@
 from aiogram import Dispatcher, types, F
-from aiogram.fsm.context import FSMContext
 
 from modules.movieAPI import MovieAPI
-from modules.database import FavoritesDB
+from modules.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.markup import InfoInlineMarkup, SearchResultInlineMarkup
 from modules.handlers.general import _send_movie
@@ -11,7 +10,7 @@ from modules.handlers.general import _send_movie
 async def show_more_results(
     callback: types.CallbackQuery,
     movie_api: MovieAPI,
-    db: FavoritesDB,
+    db: FavoritesRedis,
 ):
     """
     Called on a `show_more_results` callback (when user presses "Show more results" button unser a serach result).
@@ -42,7 +41,7 @@ async def show_more_results(
     await callback.answer(template.SEARCH_MORE_DISPLAYED_ALERT + str(len(other_results)))
 
 
-async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
+async def update_favorites(callback: types.CallbackQuery, db: FavoritesRedis):
     """
     Called on a `favorites:<action>:<movie_id>` callback (when user presses "Add to favorites" or "Remove from favorites" button under a movie info).
 
@@ -75,7 +74,7 @@ async def update_favorites(callback: types.CallbackQuery, db: FavoritesDB):
 async def expand_from_button(
     callback: types.CallbackQuery,
     movie_api: MovieAPI,
-    db: FavoritesDB,
+    db: FavoritesRedis,
 ):
     """
     Called on an `expand_<from>:<movie_id>` callback (when user presses a movie button in a favorites or trending lists).

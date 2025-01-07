@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.media_group import MediaGroupBuilder
 
 from modules.movieAPI import MovieAPI
-from modules.database import FavoritesDB
+from modules.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.common import SpecialStateMachine, Movie
 from modules.types.markup import (
@@ -45,7 +45,7 @@ async def search(
     message: types.Message,
     state: FSMContext,
     movie_api: MovieAPI,
-    db: FavoritesDB,
+    db: FavoritesRedis,
     command: CommandObject = None,
 ):
     """
@@ -98,7 +98,7 @@ async def search(
         await state.set_data({"other_results": results[1:]})
 
 
-async def list_favorites(message: types.Message, movie_api: MovieAPI, db: FavoritesDB):
+async def list_favorites(message: types.Message, movie_api: MovieAPI, db: FavoritesRedis):
     """
     Called on `/favorites` command or on button "Show favorites" in main menu.
 
