@@ -30,22 +30,8 @@ async def help_msg(message: types.Message):
     await message.answer(template.HELP)
 
 
-async def get_all_data(message: types.Message, db: FavoritesRedis):
-    """
-    Used for db testing and output. Will be removed in prod or kept for admins
-
-    Sends back all the data in the database
-    """
-    if not message.from_user.id in config.ADMINS:
-        await message.answer(template.ERROR_ACCESS_DENIED)
-    else:
-        await message.answer(str(db.get_all()))
-
-
 def setup(dp: Dispatcher):
     dp.message.register(start, Command("start"))
 
     dp.message.register(help_msg, Command("help"))
     dp.message.register(help_msg, F.text == template.BUTTON_HELP)
-
-    dp.message.register(get_all_data, Command("all"))
