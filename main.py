@@ -3,8 +3,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 
-from modules.movieAPI import MovieAPI
-from modules.database import FavoritesDB
+from modules.services.movieAPI import MovieAPI
+from modules.services.database import FavoritesRedis
 
 from modules.handlers.general import setup as setup_general
 from modules.handlers.commands import setup as setup_commands
@@ -13,7 +13,6 @@ from modules.handlers.fsm import setup as setup_fsm
 
 import config
 import logging
-import os
 
 
 async def main():
@@ -24,7 +23,11 @@ async def main():
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
     movie_api = MovieAPI(config.TMDB_ACCESS_TOKEN)
-    db = FavoritesDB(config.DB_PATH)
+    db = FavoritesRedis(
+        host=config.REDIS_HOST,
+        port=config.REDIS_PORT,
+        password=config.REDIS_PASSWORD,
+    )
 
     dp = Dispatcher(db=db, movie_api=movie_api)
     setup_general(dp)

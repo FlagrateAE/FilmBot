@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types, F
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 
-from modules.database import FavoritesDB
+from modules.services.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.common import SpecialStateMachine
 from modules.types.markup import ClearConfirmMarkup, MainMenuMarkup
@@ -20,7 +20,7 @@ async def search_start(message: types.Message, state: FSMContext):
     await state.set_state(SpecialStateMachine.search_input)
 
 
-async def clear_confirm(message: types.Message, state: FSMContext, db: FavoritesDB):
+async def clear_confirm(message: types.Message, state: FSMContext, db: FavoritesRedis):
     """
     Called on clear button pressed in main menu.
     Start a clear confirmation dialog
@@ -38,7 +38,7 @@ async def clear_confirm(message: types.Message, state: FSMContext, db: Favorites
         await message.answer(template.FAVORITES_LIST_EMPTY)
 
 
-async def clear_yes(message: types.Message, state: FSMContext, db: FavoritesDB):
+async def clear_yes(message: types.Message, state: FSMContext, db: FavoritesRedis):
     """
     Called on clear confiramtion by respective keyboard button. Clears user favorite movies list.
 

@@ -2,14 +2,14 @@ from aiogram import Dispatcher, types, F
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 
-from modules.database import FavoritesDB
+from modules.services.database import FavoritesRedis
 import modules.messageTemplates as template
 from modules.types.markup import MainMenuMarkup
 
 import config
 
 
-async def start(message: types.Message, state: FSMContext, db: FavoritesDB):
+async def start(message: types.Message, state: FSMContext, db: FavoritesRedis):
     """
     Function called on `/start` command
 
@@ -30,22 +30,8 @@ async def help_msg(message: types.Message):
     await message.answer(template.HELP)
 
 
-async def get_all_data(message: types.Message, db: FavoritesDB):
-    """
-    Used for db testing and output. Will be removed in prod or kept for admins
-
-    Sends back all the data in the database
-    """
-    if not message.from_user.id in config.ADMINS:
-        await message.answer(template.ERROR_ACCESS_DENIED)
-    else:
-        await message.answer(str(db.get_all()))
-
-
 def setup(dp: Dispatcher):
     dp.message.register(start, Command("start"))
 
     dp.message.register(help_msg, Command("help"))
     dp.message.register(help_msg, F.text == template.BUTTON_HELP)
-
-    dp.message.register(get_all_data, Command("all"))
