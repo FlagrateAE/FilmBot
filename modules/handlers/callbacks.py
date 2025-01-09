@@ -2,7 +2,7 @@ from aiogram import Dispatcher, types, F
 
 from modules.services.movieAPI import MovieAPI
 from modules.services.database import FavoritesRedis
-import modules.messageTemplates as template
+from modules.types.common import MessageTemplates as template
 from modules.types.markup import InfoInlineMarkup, SearchResultInlineMarkup
 from modules.handlers.general import _send_movie
 
@@ -22,10 +22,10 @@ async def show_more_results(
     try:
         other_results = movie_api.movie_factory(other_ids)
     except KeyError:
-        await callback.answer(template.GENERAL_ERROR)
+        await callback.answer(template().GENERAL_ERROR)
         return
     
-    await callback.message.answer(template.SEARCH_MORE_PENDING + str(len(other_results)))
+    await callback.message.answer(template().SEARCH_MORE_PENDING + str(len(other_results)))
 
     for result in other_results:
         action = (
@@ -38,7 +38,7 @@ async def show_more_results(
 
         await _send_movie(callback.message, result, markup)
 
-    await callback.answer(template.SEARCH_MORE_DISPLAYED_ALERT + str(len(other_results)))
+    await callback.answer(template().SEARCH_MORE_DISPLAYED_ALERT + str(len(other_results)))
 
 
 async def update_favorites(callback: types.CallbackQuery, db: FavoritesRedis):
@@ -57,10 +57,10 @@ async def update_favorites(callback: types.CallbackQuery, db: FavoritesRedis):
     db.update_movies_in_user(callback.from_user.id, action, movie_id)
 
     if action == "add":
-        await callback.answer(template.ALERT_FAVORITES_ADDED)
+        await callback.answer(template().ALERT_FAVORITES_ADDED)
         anti_action = "remove"
     elif action == "remove":
-        await callback.answer(template.ALERT_FAVORITES_REMOVED)
+        await callback.answer(template().ALERT_FAVORITES_REMOVED)
         anti_action = "add"
 
     # change the inline button respectively: if added, set remove and vice versa

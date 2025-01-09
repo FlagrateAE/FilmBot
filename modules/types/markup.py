@@ -5,7 +5,7 @@ from aiogram.types import (
     KeyboardButton,
 )
 
-import modules.messageTemplates as template
+from modules.types.common import MessageTemplates as template
 from modules.types.common import Movie
 
 
@@ -25,15 +25,15 @@ class MainMenuMarkup(ReplyKeyboardMarkup):
         super().__init__(
             keyboard=[
                 [
-                    KeyboardButton(text=template.BUTTON_SEARCH),
+                    KeyboardButton(text=template().BUTTON_SEARCH),
                 ],
                 [
-                    KeyboardButton(text=template.BUTTON_FAVORITES_SHOW),
-                    KeyboardButton(text=template.BUTTON_TRENDING),
+                    KeyboardButton(text=template().BUTTON_FAVORITES_SHOW),
+                    KeyboardButton(text=template().BUTTON_TRENDING),
                 ],
                 [
-                    KeyboardButton(text=template.BUTTON_FAVORITES_CLEAR),
-                    KeyboardButton(text=template.BUTTON_HELP),
+                    KeyboardButton(text=template().BUTTON_FAVORITES_CLEAR),
+                    KeyboardButton(text=template().BUTTON_HELP),
                 ],
             ],
             resize_keyboard=True,
@@ -63,12 +63,12 @@ class InfoInlineMarkup(InlineKeyboardMarkup):
 
         if favorites_action == "add":
             favorites_button = InlineKeyboardButton(
-                text=template.BUTTON_FAVORITES_ADD,
+                text=template().BUTTON_FAVORITES_ADD,
                 callback_data=f"favorites_add:{movie_id}",
             )
         elif favorites_action == "remove":
             favorites_button = InlineKeyboardButton(
-                text=template.BUTTON_FAVORITES_REMOVE,
+                text=template().BUTTON_FAVORITES_REMOVE,
                 callback_data=f"favorites_remove:{movie_id}",
             )
 
@@ -110,7 +110,7 @@ class SearchResultInlineMarkup(InfoInlineMarkup):
         self.inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text=template.BUTTON_SHOW_MORE,
+                    text=template().BUTTON_SHOW_MORE,
                     callback_data="others:" + ids,
                 )
             ]
@@ -188,8 +188,8 @@ class ClearConfirmMarkup(ReplyKeyboardMarkup):
         super().__init__(
             keyboard=[
                 [
-                    KeyboardButton(text=template.BUTTON_CLEAR_CONFIRM),
-                    KeyboardButton(text=template.BUTTON_CLEAR_CANCEL),
+                    KeyboardButton(text=template().BUTTON_CLEAR_CONFIRM),
+                    KeyboardButton(text=template().BUTTON_CLEAR_CANCEL),
                 ],
             ],
             resize_keyboard=True,

@@ -5,7 +5,7 @@ from aiogram.utils.media_group import MediaGroupBuilder
 
 from modules.services.movieAPI import MovieAPI
 from modules.services.database import FavoritesRedis
-import modules.messageTemplates as template
+from modules.types.common import MessageTemplates as template
 from modules.types.common import SpecialStateMachine, Movie
 from modules.types.markup import (
     InfoInlineMarkup,
@@ -59,7 +59,7 @@ async def search(
         if command.args:
             query = command.args
         else:
-            await message.answer(template.SEARCH_MISSING_QUERY)
+            await message.answer(template().SEARCH_MISSING_QUERY)
             return
     else:
         query = message.text
@@ -67,7 +67,7 @@ async def search(
     results = movie_api.search(query)
 
     if not results:
-        await message.answer(template.SEARCH_NOT_FOUND)
+        await message.answer(template().SEARCH_NOT_FOUND)
         return
 
     best_result = results[0]
@@ -108,11 +108,11 @@ async def list_favorites(message: types.Message, movie_api: MovieAPI, db: Favori
     favorites = db.get_user_movies(message.from_user.id)
 
     if not favorites:
-        await message.answer(template.FAVORITES_LIST_EMPTY)
+        await message.answer(template().FAVORITES_LIST_EMPTY)
         return
 
     markup = FavoritesInlineMarkup(movie_api.movie_factory(favorites))
-    await message.answer(text=template.BUTTON_FAVORITES_SHOW, reply_markup=markup)
+    await message.answer(text=template().BUTTON_FAVORITES_SHOW, reply_markup=markup)
 
 
 async def trending(message: types.Message, movie_api: MovieAPI):
@@ -142,7 +142,7 @@ def setup(dp: Dispatcher):
     dp.message.register(search, F.text, SpecialStateMachine.search_input)
 
     dp.message.register(list_favorites, Command("favorites"))
-    dp.message.register(list_favorites, F.text == template.BUTTON_FAVORITES_SHOW)
+    dp.message.register(list_favorites, F.text == template().BUTTON_FAVORITES_SHOW)
 
     dp.message.register(trending, Command("trending"))
-    dp.message.register(trending, F.text == template.BUTTON_TRENDING)
+    dp.message.register(trending, F.text == template().BUTTON_TRENDING)
