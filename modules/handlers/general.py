@@ -41,6 +41,21 @@ async def _send_movie(
         await message.answer(text=movie.text, reply_markup=markup)
 
 
+async def _handle_command_search(
+    message: types.Message, command: CommandObject
+) -> str | None:
+    """Handle search from command with arguments"""
+    if not command.args:
+        await message.answer(template().SEARCH_MISSING_QUERY)
+        return None
+    return command.args
+
+
+async def _handle_message_search(message: types.Message, command=None) -> str:
+    """Handle search from direct message"""
+    return message.text
+
+
 async def search(
     message: types.Message,
     state: FSMContext,
@@ -55,14 +70,11 @@ async def search(
     Resets the state
     """
 
-    if command:
-        if command.args:
-            query = command.args
-        else:
-            await message.answer(template().SEARCH_MISSING_QUERY)
-            return
-    else:
-        query = message.text
+    search_handlers = {True: _handle_command_search, False: _handle_message_search}
+
+    query = await search_handlers[command is not None](message, command)
+    if not query:
+        return
 
     results = movie_api.search(query)
 
@@ -98,7 +110,9 @@ async def search(
         await state.set_data({"other_results": results[1:]})
 
 
-async def list_favorites(message: types.Message, movie_api: MovieAPI, db: FavoritesRedis):
+async def list_favorites(
+    message: types.Message, movie_api: MovieAPI, db: FavoritesRedis
+):
     """
     Called on `/favorites` command or on button "Show favorites" in main menu.
 
