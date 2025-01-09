@@ -25,6 +25,7 @@ class FavoritesRedis:
         Initialize the Redis connection
 
         Parameters
+        ----------
         host: str
             The hostname of the Redis server
         port: int

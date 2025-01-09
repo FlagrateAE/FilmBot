@@ -1,4 +1,5 @@
 from aiogram.fsm.state import StatesGroup, State
+import yaml
 
 
 class Movie:
@@ -160,6 +161,25 @@ class Movie:
             data["trailer_url"],
         )
 
+class MessageTemplates:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls, yaml_path="modules/messageTemplates.yaml"):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self, yaml_path="modules/messageTemplates.yaml"):
+        # only initialize once
+        if not MessageTemplates._initialized:
+                
+            with open(yaml_path, 'r', encoding='utf-8') as file:
+                templates = yaml.safe_load(file)
+                for key, value in templates.items():
+                    setattr(self, key, value)
+            
+            MessageTemplates._initialized = True
 
 class SpecialStateMachine(StatesGroup):
     """
